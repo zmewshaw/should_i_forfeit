@@ -78,8 +78,8 @@ class leagueStats:
             for i in range(100):
                 tempForfeit = leagueStats.runSimForfeit(winrate,gain,lose)
                 tempHostage = leagueStats.runSimHostage(winrate,winnablePercent,gain,lose)
-                plt.scatter(tempForfeit[0],tempForfeit[1],c='red',s=1,alpha=.1)
-                plt.scatter(tempHostage[0],tempHostage[1],c='blue',s=1,alpha=.1)
+#                plt.scatter(tempForfeit[0],tempForfeit[1],c='red',s=1,alpha=.1)
+#                plt.scatter(tempHostage[0],tempHostage[1],c='blue',s=1,alpha=.1)
 # store values for line of best fit
                 for j in range(2):
                     totalForfeit[j] += tempForfeit[j]
@@ -95,14 +95,24 @@ class leagueStats:
             graphsForfeit.append(pForfeit)
             graphsHostage.append(pHostage)
             count += 1
-            print('maxForfeit: '+str(maxForfeit))
-            print('maxHostage: '+str(maxHostage))
+            print('maxForfeit: '+ str(maxForfeit))
+            print('maxHostage: '+ str(maxHostage))
+        numRows = 0
+        if not int(count/2):
+            plb.plot(totalForfeit[0], pForfeit(totalForfeit[0]), c = 'red')
+            plb.plot(totalHostage[0], pHostage(totalHostage[0]), c = 'blue')
+        else:
+            subCount = 0
+            fig, axs = plt.subplots(2, int(count/2))
+            fig.suptitle("Simulation")
+            for i in range(2):
+                for j in range(int(count/2)):
+                    axs[i][j].plot(totalForfeit[subCount][0], totalForfeit[subCount][1])
+                    subCount += 1
         print('{totalHours} hours were simulated to determine that you should FF unless your game is winnable {winnablePercent}% of the time'.format(totalHours=count*100,winnablePercent=winnablePercent))
         print(graphsForfeit)
         print(graphsHostage)
         print(winnablePercent)
-        plb.plot(totalForfeit[0],pForfeit(totalForfeit[0]),c='red')
-        plb.plot(totalHostage[0],pHostage(totalHostage[0]),c='blue')
         plt.xlabel('Time (minutes)')
         plt.ylabel('LP')
         plt.title('Forfeit at 20 Player vs Hostage Player')
