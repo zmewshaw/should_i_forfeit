@@ -56,6 +56,16 @@ class leagueStats:
             x.append(time)
             y.append(lp)
         return [x,y]
+# function for graphing subplots
+    def graph(totalForfeit, totalPForfeit, totalHostage, totalPHostage, simCount):
+        fig, axs = plt.subplots(simCount)
+        fig.suptitle("Simulation")
+        for i in range(simCount):
+            axs[i].plot(totalForfeit[i][0], totalForfeit[i][1])
+            axs[i].plot(totalPForfeit[i])
+            axs[i].plot(totalHostage[i][0], totalHostage[i][1])
+            axs[i].plot(totalPHostage[i])
+# main function
     def main():
 # prompt user input
         summonerName = input('Summoner Name? ')
@@ -63,56 +73,39 @@ class leagueStats:
         lose = int(input('What are your LP losses? '))
         winrate = leagueStats.winrate(summonerName)
 # run a simulation i times and plot each point generated
-        totalForfeit = [[],[]]
-        totalHostage = [[],[]]
-        graphsForfeit = []
-        graphsHostage = []
+        totalForfeit = []
+        totalHostage = []
+        totalPForfeit = []
+        totalPHostage = []
         maxForfeit = 0
         maxHostage = 0
-        winnablePercent = 0
         count = 0
         print('Simulating games')
         while maxForfeit >= maxHostage:
-            totalForfeit = [[],[]]
-            totalHostage = [[],[]]
+            simForfeit = [[],[]]
+            simHostage = [[],[]]
             for i in range(100):
                 tempForfeit = leagueStats.runSimForfeit(winrate,gain,lose)
-                tempHostage = leagueStats.runSimHostage(winrate,winnablePercent,gain,lose)
-#                plt.scatter(tempForfeit[0],tempForfeit[1],c='red',s=1,alpha=.1)
-#                plt.scatter(tempHostage[0],tempHostage[1],c='blue',s=1,alpha=.1)
-# store values for line of best fit
+                tempHostage = leagueStats.runSimHostage(winrate,count,gain,lose)
                 for j in range(2):
-                    totalForfeit[j] += tempForfeit[j]
-                    totalHostage[j] += tempHostage[j]
-# create and draw lines of best fit
-            zForfeit = np.polyfit(totalForfeit[0],totalForfeit[1],1)
-            zHostage = np.polyfit(totalHostage[0],totalHostage[1],1)
+                    simForfeit[j] += tempForfeit[j]
+                    simHostage[j] += tempHostage[j]
+            totalForfeit.append(simForfeit)
+            totalHostage.append(simHostage)
+# calculate the max of each line of best fit
+            zForfeit = np.polyfit(simForfeit[0],simForfeit[1],1)
+            zHostage = np.polyfit(simHostage[0],simHostage[1],1)
             pForfeit = np.poly1d(zForfeit)
             pHostage = np.poly1d(zHostage)
+            totalPForfeit.append(pForfeit)
+            totalPHostage.append(pHostage)
             maxForfeit = pForfeit(6000)
             maxHostage = pHostage(6000)
-            winnablePercent += 1
-            graphsForfeit.append(pForfeit)
-            graphsHostage.append(pHostage)
             count += 1
             print('maxForfeit: '+ str(maxForfeit))
             print('maxHostage: '+ str(maxHostage))
-        numRows = 0
-        if not int(count/2):
-            plb.plot(totalForfeit[0], pForfeit(totalForfeit[0]), c = 'red')
-            plb.plot(totalHostage[0], pHostage(totalHostage[0]), c = 'blue')
-        else:
-            subCount = 0
-            fig, axs = plt.subplots(2, int(count/2))
-            fig.suptitle("Simulation")
-            for i in range(2):
-                for j in range(int(count/2)):
-                    axs[i][j].plot(totalForfeit[subCount][0], totalForfeit[subCount][1])
-                    subCount += 1
-        print('{totalHours} hours were simulated to determine that you should FF unless your game is winnable {winnablePercent}% of the time'.format(totalHours=count*100,winnablePercent=winnablePercent))
-        print(graphsForfeit)
-        print(graphsHostage)
-        print(winnablePercent)
+        leagueStats.graph(totalForfeit, totalPForfeit, totalHostage, totalPHostage, count)
+        print('{totalHours} hours were simulated to determine that you should FF unless your game is winnable {winnablePercent}% of the time'.format(totalHours = count * 100, winnablePercent = count))
         plt.xlabel('Time (minutes)')
         plt.ylabel('LP')
         plt.title('Forfeit at 20 Player vs Hostage Player')
