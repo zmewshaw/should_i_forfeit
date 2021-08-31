@@ -1,17 +1,20 @@
 from riotwatcher import LolWatcher
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib.pylab as plb
 
-watcher = LolWatcher('RGAPI-741e14e0-ea7e-4439-a05a-ad4e4bc1bdf2')
+watcher = LolWatcher("RGAPI-47b9a89f-0fab-4883-83fb-0a5f7a652e18")
 
 class leagueStats:
+# function to query winrate from riotAPI
     def winrate(summonerName):
-        summoner = watcher.summoner.by_name('na1',summonerName)
-        stats = watcher.league.by_summoner('na1',summoner['id'])
-        return round(100*(stats[0]['wins']/(stats[0]['wins']+stats[0]['losses'])))
+        summoner = watcher.summoner.by_name("na1", summonerName)
+        stats = watcher.league.by_summoner("na1", summoner["id"])
+        if "RANKED_SOLO_5x5" in stats[0].values():
+            return round(100 * (stats[0]["wins"] / (stats[0]["wins"] + stats[0]["losses"])))
+        else:
+            return round(100 * (stats[1]["wins"] / (stats[1]["wins"] + stats[1]["losses"])))
 # function for a player that forfeits every game predetermined to be a loss at 20 minutes
-    def runSimForfeit(winrate,gain,lose):
+    def runSimForfeit(winrate, gain, lose):
         x = []
         y = []
         time = 0
@@ -56,56 +59,68 @@ class leagueStats:
             x.append(time)
             y.append(lp)
         return [x,y]
+# function for graphing subplots
+    def graph(totalForfeit, totalHostage, totalPForfeit, totalPHostage, simCount):
+        cols = 3
+        rows = simCount // cols
+        rows += simCount % cols
+        position = range(1, simCount + 1)
+        fig = plt.figure()
+        fig.suptitle("{totalHours} hours were simulated to determine that you should FF if your odds of winning are less than or equal to {winnablePercent}%".format(totalHours = simCount * 1000, winnablePercent = simCount - 1))
+        for i in range(simCount):
+            ax = fig.add_subplot(rows, cols, position[i])
+            ax.scatter(totalForfeit[i][0], totalForfeit[i][1], s = .5, c = "red", alpha = .05)
+            ax.scatter(totalHostage[i][0], totalHostage[i][1], s = .5, c = "blue", alpha = .05)
+            ax.plot(totalForfeit[i][0], totalPForfeit[i](totalForfeit[i][0]), c = 'red')
+            ax.plot(totalHostage[i][0], totalPHostage[i](totalHostage[i][0]), c = "blue")
+            ax.set_title("{i}% Winnable".format(i = i))
+            ax.set_xlabel("Time (min)")
+            ax.set_ylabel("LP")
+            ax.legend(["Forfeit Player", "Hostage Player"])
+        fig.tight_layout()
+        plt.show()
+# main function
     def main():
 # prompt user input
-        summonerName = input('Summoner Name? ')
-        gain = int(input('What are your LP gains? '))
-        lose = int(input('What are your LP losses? '))
+        summonerName = input("Summoner Name? ")
+        gain = int(input("What are your LP gains? "))
+        lose = int(input("What are your LP losses? "))
         winrate = leagueStats.winrate(summonerName)
-# run a simulation i times and plot each point generated
-        totalForfeit = [[],[]]
-        totalHostage = [[],[]]
-        graphsForfeit = []
-        graphsHostage = []
+        totalForfeit = []
+        totalHostage = []
+        totalPForfeit = []
+        totalPHostage = []
         maxForfeit = 0
         maxHostage = 0
-        winnablePercent = 0
         count = 0
-        print('Simulating games')
         while maxForfeit >= maxHostage:
-            totalForfeit = [[],[]]
-            totalHostage = [[],[]]
-            for i in range(100):
-                tempForfeit = leagueStats.runSimForfeit(winrate,gain,lose)
-                tempHostage = leagueStats.runSimHostage(winrate,winnablePercent,gain,lose)
-                plt.scatter(tempForfeit[0],tempForfeit[1],c='red',s=1,alpha=.1)
-                plt.scatter(tempHostage[0],tempHostage[1],c='blue',s=1,alpha=.1)
-# store values for line of best fit
+            simForfeit = [[],[]]
+            simHostage = [[],[]]
+            halfSimForfeit = [[],[]]
+            halfSimHostage = [[],[]]
+# run a simulation i times and plot each point generated
+            for i in range(1000):
+                tempForfeit = leagueStats.runSimForfeit(winrate, gain, lose)
+                tempHostage = leagueStats.runSimHostage(winrate, count, gain, lose)
                 for j in range(2):
-                    totalForfeit[j] += tempForfeit[j]
-                    totalHostage[j] += tempHostage[j]
-# create and draw lines of best fit
-            zForfeit = np.polyfit(totalForfeit[0],totalForfeit[1],1)
-            zHostage = np.polyfit(totalHostage[0],totalHostage[1],1)
+                    simForfeit[j] += tempForfeit[j]
+                    simHostage[j] += tempHostage[j]
+# only append half the simulations to graph
+                    if i % 10 == 0:
+                        halfSimForfeit[j] += tempForfeit[j]
+                        halfSimHostage[j] += tempHostage[j]
+            totalForfeit.append(halfSimForfeit)
+            totalHostage.append(halfSimHostage)
+# calculate the max of each line of best fit
+            zForfeit = np.polyfit(simForfeit[0], simForfeit[1],1)
+            zHostage = np.polyfit(simHostage[0], simHostage[1],1)
             pForfeit = np.poly1d(zForfeit)
             pHostage = np.poly1d(zHostage)
+            totalPForfeit.append(pForfeit)
+            totalPHostage.append(pHostage)
             maxForfeit = pForfeit(6000)
             maxHostage = pHostage(6000)
-            winnablePercent += 1
-            graphsForfeit.append(pForfeit)
-            graphsHostage.append(pHostage)
             count += 1
-            print('maxForfeit: '+str(maxForfeit))
-            print('maxHostage: '+str(maxHostage))
-        print('{totalHours} hours were simulated to determine that you should FF unless your game is winnable {winnablePercent}% of the time'.format(totalHours=count*100,winnablePercent=winnablePercent))
-        print(graphsForfeit)
-        print(graphsHostage)
-        print(winnablePercent)
-        plb.plot(totalForfeit[0],pForfeit(totalForfeit[0]),c='red')
-        plb.plot(totalHostage[0],pHostage(totalHostage[0]),c='blue')
-        plt.xlabel('Time (minutes)')
-        plt.ylabel('LP')
-        plt.title('Forfeit at 20 Player vs Hostage Player')
-        plt.legend(['Forfeit at 20 Player', 'Hostage Player'])
-        plt.show()
+# debug graphs: print("{count}: maxForfeit = {maxForfeit} | maxHostage = {maxHostage}".format(count = count, maxForfeit = maxForfeit, maxHostage = maxHostage))
+        leagueStats.graph(totalForfeit, totalHostage, totalPForfeit, totalPHostage, count)
 leagueStats.main()
