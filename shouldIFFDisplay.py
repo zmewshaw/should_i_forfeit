@@ -6,7 +6,11 @@ watcher = LolWatcher("RGAPI-47b9a89f-0fab-4883-83fb-0a5f7a652e18")
 
 class leagueStats:
 # function to query winrate from riotAPI
-    def winrate(summonerName):
+    def winrate(region, summonerName):
+# regions are currently hard coded
+        if region == ('KR1' or 'RU1'):
+            region = region.strip('1')
+# query summoner and stats dictionaries
         summoner = watcher.summoner.by_name("na1", summonerName)
         stats = watcher.league.by_summoner("na1", summoner["id"])
         if "RANKED_SOLO_5x5" in stats[0].values():
@@ -22,19 +26,19 @@ class leagueStats:
 # start a loop that ends when the player hits 100 hours
         while time < 6000:
 # test if game is predetermined to be a loss
-            if winrate < np.random.randint(1,101):
+            if winrate < np.random.randint(1, 101):
                 lp -= lose
                 time += 20
 # else game is predetermined to be a win
             else:
                 lp += gain
-                time += np.random.randint(20,56)
+                time += np.random.randint(20, 56)
 # store values to an array
             x.append(time)
             y.append(lp)
-        return [x,y]
+        return [x, y]
 # function for a player that holds every game hostage for the chance that a predetermined loss is winnable
-    def runSimHostage(winrate,winnablePercent,gain,lose):
+    def runSimHostage(winrate, winnablePercent, gain, lose):
         x = []
         y = []
         time = 0
@@ -42,9 +46,9 @@ class leagueStats:
 # start a loop that ends when the player hits 100 hours
         while time < 6000:
 # test if the game is predetermined to be a loss
-            if winrate < np.random.randint(1,101):
+            if winrate < np.random.randint(1, 101):
 # test if the predetermined loss is actually a loss
-                if winnablePercent < np.random.randint(1,101):
+                if winnablePercent < np.random.randint(1, 101):
                     lp -= lose
                     time += 40
 # else game is won
@@ -54,11 +58,11 @@ class leagueStats:
 # else game is predetermined to be a win
             else:
                 lp += gain
-                time += np.random.randint(20,56)
+                time += np.random.randint(20, 56)
 # store values to an array
             x.append(time)
             y.append(lp)
-        return [x,y]
+        return [x, y]
 # function for graphing subplots
     def graph(totalForfeit, totalHostage, totalPForfeit, totalPHostage, simCount):
         cols = 3
@@ -81,11 +85,12 @@ class leagueStats:
         plt.show()
 # main function
     def main():
-# prompt user input
+# prompt user input, regions are currently hard coded
+        region = input('Region? (NA, EUW, KR, etc.) ') + '1'
         summonerName = input("Summoner Name? ")
         gain = int(input("What are your LP gains? "))
         lose = int(input("What are your LP losses? "))
-        winrate = leagueStats.winrate(summonerName)
+        winrate = leagueStats.winrate(region, summonerName)
         totalForfeit = []
         totalHostage = []
         totalPForfeit = []
