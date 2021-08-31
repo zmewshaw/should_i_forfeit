@@ -1,0 +1,56 @@
+*{margin: 0, padding: 0, box-sizing: border-box}
+body{height: 100vh, width: 100vw, text-align: center}
+.title {
+    text-align: center;
+    margin-top: 300px;
+}
+.form {
+    width: 70%;
+    min-width: 800;
+    padding: 8px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: no-wrap;
+    position: absolute;
+    top: 55%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 900px;
+}
+.summonerName {
+    margin-bottom: 10px;
+}
+.summonerName > input {
+    width: 100%;
+}
+.textInput {
+    flex-basis: 85%;
+}
+.gainLoss {
+    display: flex;
+    justify-content: space-around;
+}
+.gainLoss > input {
+    width: 40%;
+}
+.simulate {
+    position: relative;
+    flex-basis: 15%;
+}
+.simulate > input {
+    position: absolute;
+    left: 10%;
+    top: 50%;
+    transform: translate(0%, -50%);
+}
+@media only screen and (max-width: 700px) {
+    .simulate {
+        flex-basis: 100%;
+    }
+    .simulate > input {
+        width: 80%;
+    }
+    .textInput {
+        flex-basis: 100%;
+    }
+}
