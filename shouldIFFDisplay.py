@@ -2,13 +2,17 @@ from riotwatcher import LolWatcher
 import numpy as np
 import matplotlib.pyplot as plt
 
-watcher = LolWatcher("RGAPI-741e14e0-ea7e-4439-a05a-ad4e4bc1bdf2")
+watcher = LolWatcher("RGAPI-47b9a89f-0fab-4883-83fb-0a5f7a652e18")
 
 class leagueStats:
+# function to query winrate from riotAPI
     def winrate(summonerName):
         summoner = watcher.summoner.by_name("na1", summonerName)
         stats = watcher.league.by_summoner("na1", summoner["id"])
-        return round(100 * (stats[0]["wins"] / (stats[0]["wins"] + stats[0]["losses"])))
+        if "RANKED_SOLO_5x5" in stats[0].values():
+            return round(100 * (stats[0]["wins"] / (stats[0]["wins"] + stats[0]["losses"])))
+        else:
+            return round(100 * (stats[1]["wins"] / (stats[1]["wins"] + stats[1]["losses"])))
 # function for a player that forfeits every game predetermined to be a loss at 20 minutes
     def runSimForfeit(winrate, gain, lose):
         x = []
@@ -58,33 +62,25 @@ class leagueStats:
 # function for graphing subplots
     def graph(totalForfeit, totalHostage, totalPForfeit, totalPHostage, simCount):
         cols = 3
-        count = 0
         rows = simCount // cols
         rows += simCount % cols
         position = range(1, simCount + 1)
-        print("position = " + str(position))
         fig = plt.figure()
-        fig.suptitle("Results: (only 1 in 10 simulations are displayed)")
+        fig.suptitle("{totalHours} hours were simulated to determine that you should FF if your odds of winning are less than {winnablePercent}%".format(totalHours = simCount * 1000, winnablePercent = simCount))
         for i in range(simCount):
             ax = fig.add_subplot(rows, cols, position[i])
-            ax.scatter(totalForfeit[i][0], totalForfeit[i][1], s = .5, c="red", alpha = .05)
-            ax.scatter(totalHostage[i][0], totalHostage[i][1], s = .5, c="blue", alpha = .05)
-#            ax.plot(totalPForfeit[i], c="red")
-#            ax.plot(totalPHostage[i], c="blue")
-        print(totalPForfeit)
-        print(totalPHostage)
+            ax.scatter(totalForfeit[i][0], totalForfeit[i][1], s = .5, c = "red", alpha = .05)
+            ax.scatter(totalHostage[i][0], totalHostage[i][1], s = .5, c = "blue", alpha = .05)
+            ax.plot(totalForfeit[i][0], totalPForfeit[i](totalForfeit[i][0]), c = 'red')
+            ax.plot(totalHostage[i][0], totalPHostage[i](totalHostage[i][0]), c = "blue")
+            ax.set_title("{i}% Winnable".format(i = i))
+            ax.set_xlabel("Time (min)")
+            ax.set_ylabel("LP")
+            ax.legend("Forfeit Player", "Hostage Player")
+#        handles, labels = ax.get_legend_handles_labels()
+#        fig.legend(handles, labels, loc='upper right')
+        fig.tight_layout()
         plt.show()
-
-#        fig.subplots_adjust(hspace = 1)
-#        for i in range():
-#            for j in range(cols):
-#                axs[i, j].scatter(totalForfeit[i][0], totalForfeit[i][1], s = .5, c="red", alpha = .1)
-#                axs[i, j].scatter(totalHostage[i][0], totalHostage[i][1], s = .5, c="blue", alpha = .1)
-#                axs[i, j].plot(totalPForfeit[i], c="red")
-#                axs[i, j].plot(totalPHostage[i], c="blue")
-#                axs[i, j].set_title("{count}% Winnable".format(count = count))
-#                count += 1
-
 # main function
     def main():
 # prompt user input
@@ -92,7 +88,6 @@ class leagueStats:
         gain = int(input("What are your LP gains? "))
         lose = int(input("What are your LP losses? "))
         winrate = leagueStats.winrate(summonerName)
-        print("winrate = " + str(winrate))
         totalForfeit = []
         totalHostage = []
         totalPForfeit = []
@@ -100,7 +95,6 @@ class leagueStats:
         maxForfeit = 0
         maxHostage = 0
         count = 0
-        print("Simulating games")
         while maxForfeit >= maxHostage:
             simForfeit = [[],[]]
             simHostage = [[],[]]
@@ -129,7 +123,6 @@ class leagueStats:
             maxForfeit = pForfeit(6000)
             maxHostage = pHostage(6000)
             count += 1
-            print("{count}: maxForfeit = {maxForfeit} | maxHostage = {maxHostage}".format(count = count, maxForfeit = maxForfeit, maxHostage = maxHostage))
+# debug graphs: print("{count}: maxForfeit = {maxForfeit} | maxHostage = {maxHostage}".format(count = count, maxForfeit = maxForfeit, maxHostage = maxHostage))
         leagueStats.graph(totalForfeit, totalHostage, totalPForfeit, totalPHostage, count)
-        print("{totalHours} hours were simulated to determine that you should FF unless your game is winnable {winnablePercent}% of the time".format(totalHours = count * 100, winnablePercent = count))
 leagueStats.main()
