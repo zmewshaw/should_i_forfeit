@@ -109,5 +109,5 @@ class leagueStats:
 
 # debug graphs: print("{count}: maxForfeit = {maxForfeit} | maxHostage = {maxHostage}".format(count = count, maxForfeit = maxForfeit, maxHostage = maxHostage))
 
-        return 
+        return [totalForfeit, totalHostage, totalPForfeit, totalPHostage, count]
 leagueStats.main()
