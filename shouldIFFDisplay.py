@@ -56,30 +56,35 @@ class leagueStats:
             y.append(lp)
         return [x,y]
 # function for graphing subplots
-    def graph(totalForfeit, totalPForfeit, totalHostage, totalPHostage, simCount):
-        if simCount != 1:
-            rows = 1
-            cols = 1
-            for i in range(simCount-1):
-                if rows < cols:
-                    rows += 1
-                else:
-                    cols += 1
-            fig, axs = plt.subplots(rows, cols, sharey = True)
-            fig.suptitle("Simulation")
-            for i in range(rows):
-                for j in range(cols):
-                    axs[i, j].scatter(totalForfeit[i][0], totalForfeit[i][1], s = .2, c="red", alpha = .02, zorder = 1)
-                    axs[i, j].scatter(totalHostage[i][0], totalHostage[i][1], s = .2, c="blue", alpha = .02, zorder = 1)
-                    axs[i, j].plot(totalPForfeit[i], c="red", zorder = 2)
-                    axs[i, j].plot(totalPHostage[i], c="blue", zorder = 2)
-            plt.show()
-        else:
-            
-            axs.scatter(totalForfeit[i][0], totalForfeit[i][1], s = .2, c="red", alpha = .02, zorder = 1)
-            axs.scatter(totalHostage[i][0], totalHostage[i][1], s = .2, c="blue", alpha = .02, zorder = 1)
-            axs.plot(totalPForfeit[i], c="red", zorder = 2)
-            axs.plot(totalPHostage[i], c="blue", zorder = 2)
+    def graph(totalForfeit, totalHostage, totalPForfeit, totalPHostage, simCount):
+        cols = 3
+        count = 0
+        rows = simCount // cols
+        rows += simCount % cols
+        position = range(1, simCount + 1)
+        print("position = " + str(position))
+        fig = plt.figure()
+        fig.suptitle("Results: (only 1 in 10 simulations are displayed)")
+        for i in range(simCount):
+            ax = fig.add_subplot(rows, cols, position[i])
+            ax.scatter(totalForfeit[i][0], totalForfeit[i][1], s = .5, c="red", alpha = .05)
+            ax.scatter(totalHostage[i][0], totalHostage[i][1], s = .5, c="blue", alpha = .05)
+#            ax.plot(totalPForfeit[i], c="red")
+#            ax.plot(totalPHostage[i], c="blue")
+        print(totalPForfeit)
+        print(totalPHostage)
+        plt.show()
+
+#        fig.subplots_adjust(hspace = 1)
+#        for i in range():
+#            for j in range(cols):
+#                axs[i, j].scatter(totalForfeit[i][0], totalForfeit[i][1], s = .5, c="red", alpha = .1)
+#                axs[i, j].scatter(totalHostage[i][0], totalHostage[i][1], s = .5, c="blue", alpha = .1)
+#                axs[i, j].plot(totalPForfeit[i], c="red")
+#                axs[i, j].plot(totalPHostage[i], c="blue")
+#                axs[i, j].set_title("{count}% Winnable".format(count = count))
+#                count += 1
+
 # main function
     def main():
 # prompt user input
@@ -87,7 +92,7 @@ class leagueStats:
         gain = int(input("What are your LP gains? "))
         lose = int(input("What are your LP losses? "))
         winrate = leagueStats.winrate(summonerName)
-# run a simulation i times and plot each point generated
+        print("winrate = " + str(winrate))
         totalForfeit = []
         totalHostage = []
         totalPForfeit = []
@@ -99,15 +104,21 @@ class leagueStats:
         while maxForfeit >= maxHostage:
             simForfeit = [[],[]]
             simHostage = [[],[]]
-# i indicates number of simulations
+            halfSimForfeit = [[],[]]
+            halfSimHostage = [[],[]]
+# run a simulation i times and plot each point generated
             for i in range(1000):
                 tempForfeit = leagueStats.runSimForfeit(winrate, gain, lose)
                 tempHostage = leagueStats.runSimHostage(winrate, count, gain, lose)
                 for j in range(2):
                     simForfeit[j] += tempForfeit[j]
                     simHostage[j] += tempHostage[j]
-            totalForfeit.append(simForfeit)
-            totalHostage.append(simHostage)
+# only append half the simulations to graph
+                    if i % 10 == 0:
+                        halfSimForfeit[j] += tempForfeit[j]
+                        halfSimHostage[j] += tempHostage[j]
+            totalForfeit.append(halfSimForfeit)
+            totalHostage.append(halfSimHostage)
 # calculate the max of each line of best fit
             zForfeit = np.polyfit(simForfeit[0], simForfeit[1],1)
             zHostage = np.polyfit(simHostage[0], simHostage[1],1)
@@ -118,8 +129,7 @@ class leagueStats:
             maxForfeit = pForfeit(6000)
             maxHostage = pHostage(6000)
             count += 1
-            print("maxForfeit: "+ str(maxForfeit))
-            print("maxHostage: "+ str(maxHostage))
-        leagueStats.graph(totalForfeit, totalPForfeit, totalHostage, totalPHostage, count)
+            print("{count}: maxForfeit = {maxForfeit} | maxHostage = {maxHostage}".format(count = count, maxForfeit = maxForfeit, maxHostage = maxHostage))
+        leagueStats.graph(totalForfeit, totalHostage, totalPForfeit, totalPHostage, count)
         print("{totalHours} hours were simulated to determine that you should FF unless your game is winnable {winnablePercent}% of the time".format(totalHours = count * 100, winnablePercent = count))
 leagueStats.main()
