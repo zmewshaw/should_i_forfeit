@@ -15,8 +15,8 @@ class leagueStats:
         y = []
         time = 0
         lp = 0
-# start a loop that ends when the player hits 1000 hours
-        while time < 60000:
+# start a loop that ends when the player hits 100 hours
+        while time < 6000:
 # test if game is predetermined to be a loss
             if winrate < np.random.randint(1,101):
                 lp -= lose
@@ -35,8 +35,8 @@ class leagueStats:
         y = []
         time = 0
         lp = 0
-# start a loop that ends when the player hits 1000 hours
-        while time < 60000:
+# start a loop that ends when the player hits 100 hours
+        while time < 6000:
 # test if the game is predetermined to be a loss
             if winrate < np.random.randint(1,101):
 # test if the predetermined loss is actually a loss
@@ -57,14 +57,29 @@ class leagueStats:
         return [x,y]
 # function for graphing subplots
     def graph(totalForfeit, totalPForfeit, totalHostage, totalPHostage, simCount):
-        fig, axs = plt.subplots(simCount, sharey = True)
-        fig.suptitle("Simulation")
-        for i in range(simCount):
-            axs[i].scatter(totalForfeit[i][0], totalForfeit[i][1], c="red")
-            axs[i].plot(totalPForfeit[i], c="red")
-            axs[i].scatter(totalHostage[i][0], totalHostage[i][1], c="blue")
-            axs[i].plot(totalPHostage[i], c="blue")
-        plt.show()
+        if simCount != 1:
+            rows = 1
+            cols = 1
+            for i in range(simCount-1):
+                if rows < cols:
+                    rows += 1
+                else:
+                    cols += 1
+            fig, axs = plt.subplots(rows, cols, sharey = True)
+            fig.suptitle("Simulation")
+            for i in range(rows):
+                for j in range(cols):
+                    axs[i, j].scatter(totalForfeit[i][0], totalForfeit[i][1], s = .2, c="red", alpha = .02, zorder = 1)
+                    axs[i, j].scatter(totalHostage[i][0], totalHostage[i][1], s = .2, c="blue", alpha = .02, zorder = 1)
+                    axs[i, j].plot(totalPForfeit[i], c="red", zorder = 2)
+                    axs[i, j].plot(totalPHostage[i], c="blue", zorder = 2)
+            plt.show()
+        else:
+            
+            axs.scatter(totalForfeit[i][0], totalForfeit[i][1], s = .2, c="red", alpha = .02, zorder = 1)
+            axs.scatter(totalHostage[i][0], totalHostage[i][1], s = .2, c="blue", alpha = .02, zorder = 1)
+            axs.plot(totalPForfeit[i], c="red", zorder = 2)
+            axs.plot(totalPHostage[i], c="blue", zorder = 2)
 # main function
     def main():
 # prompt user input
@@ -85,7 +100,7 @@ class leagueStats:
             simForfeit = [[],[]]
             simHostage = [[],[]]
 # i indicates number of simulations
-            for i in range(100):
+            for i in range(1000):
                 tempForfeit = leagueStats.runSimForfeit(winrate, gain, lose)
                 tempHostage = leagueStats.runSimHostage(winrate, count, gain, lose)
                 for j in range(2):
