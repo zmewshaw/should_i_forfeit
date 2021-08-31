@@ -66,7 +66,7 @@ class leagueStats:
         rows += simCount % cols
         position = range(1, simCount + 1)
         fig = plt.figure()
-        fig.suptitle("{totalHours} hours were simulated to determine that you should FF if your odds of winning are less than {winnablePercent}%".format(totalHours = simCount * 1000, winnablePercent = simCount))
+        fig.suptitle("{totalHours} hours were simulated to determine that you should FF if your odds of winning are less than or equal to {winnablePercent}%".format(totalHours = simCount * 1000, winnablePercent = simCount - 1))
         for i in range(simCount):
             ax = fig.add_subplot(rows, cols, position[i])
             ax.scatter(totalForfeit[i][0], totalForfeit[i][1], s = .5, c = "red", alpha = .05)
@@ -76,9 +76,7 @@ class leagueStats:
             ax.set_title("{i}% Winnable".format(i = i))
             ax.set_xlabel("Time (min)")
             ax.set_ylabel("LP")
-            ax.legend("Forfeit Player", "Hostage Player")
-#        handles, labels = ax.get_legend_handles_labels()
-#        fig.legend(handles, labels, loc='upper right')
+            ax.legend(["Forfeit Player", "Hostage Player"])
         fig.tight_layout()
         plt.show()
 # main function
