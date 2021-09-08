@@ -2,7 +2,7 @@ from riotwatcher import LolWatcher
 import numpy as np
 import matplotlib.pyplot as plt
 
-watcher = LolWatcher("RGAPI-47b9a89f-0fab-4883-83fb-0a5f7a652e18")
+watcher = LolWatcher("RGAPI-e9a54b72-1052-49e2-8774-e9e6ce4d0d54")
 
 class leagueStats:
 # function to query winrate from riotAPI
