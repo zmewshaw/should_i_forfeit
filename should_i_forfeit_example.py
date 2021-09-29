@@ -1,25 +1,24 @@
-from riotwatcher import LolWatcher
+# from riotwatcher import LolWatcher
 import numpy as np
 import matplotlib.pyplot as plt
-import time
 
-watcher = LolWatcher("INSERT KEY HERE")
+# watcher = LolWatcher("INSERT KEY HERE")
 
 class leagueStats:
 # method to query winrate from riotAPI
-    def winrate(region, summonerName):
-# regions are currently hard coded
-        if region == ('KR1' or 'RU1'):
-            region = region.strip('1')
-# query summoner and stats dictionaries
-        summoner = watcher.summoner.by_name("na1", summonerName)
-        stats = watcher.league.by_summoner("na1", summoner["id"])
-        if "RANKED_SOLO_5x5" in stats[0].values():
-            return round(100 * (stats[0]["wins"] / (stats[0]["wins"] + stats[0]["losses"])))
-        else:
-            return round(100 * (stats[1]["wins"] / (stats[1]["wins"] + stats[1]["losses"])))
+#     def winrate(region, summonerName):
+# # regions are currently hard coded
+#         if region == ('KR1' or 'RU1'):
+#             region = region.strip('1')
+# # query summoner and stats dictionaries
+#         summoner = watcher.summoner.by_name("na1", summonerName)
+#         stats = watcher.league.by_summoner("na1", summoner["id"])
+#         if "RANKED_SOLO_5x5" in stats[0].values():
+#             return round(100 * (stats[0]["wins"] / (stats[0]["wins"] + stats[0]["losses"])))
+#         else:
+#             return round(100 * (stats[1]["wins"] / (stats[1]["wins"] + stats[1]["losses"])))
 # method for a player that forfeits every game predetermined to be a loss at 20 minutes
-    def runSimForfeit(winrate, gain, lose):
+    def runSimForfeit(winrate, lpGained, lpLost):
         x = []
         y = []
         time = 0
@@ -28,18 +27,18 @@ class leagueStats:
         while time < 6000:
 # test if game is predetermined to be a loss
             if winrate < np.random.randint(1, 101):
-                lp -= lose
+                lp -= lpLost
                 time += 20
 # else game is predetermined to be a win
             else:
-                lp += gain
+                lp += lpGained
                 time += np.random.randint(20, 56)
 # store values to an array
             x.append(time)
             y.append(lp)
         return [x, y]
 # method for a player that holds every game hostage for the chance that a predetermined loss is winnable
-    def runSimHostage(winrate, winnablePercent, gain, lose):
+    def runSimHostage(winrate, winnablePercent, lpGained, lpLost):
         x = []
         y = []
         time = 0
@@ -50,15 +49,15 @@ class leagueStats:
             if winrate < np.random.randint(1, 101):
 # test if the predetermined loss is actually a loss
                 if winnablePercent < np.random.randint(1, 101):
-                    lp -= lose
+                    lp -= lpLost
                     time += 40
 # else game is won
                 else:
-                    lp += gain
+                    lp += lpGained
                     time += 40
 # else game is predetermined to be a win
             else:
-                lp += gain
+                lp += lpGained
                 time += np.random.randint(20, 56)
 # store values to an array
             x.append(time)
@@ -87,11 +86,12 @@ class leagueStats:
 # main method
     def main():
 # prompt user input, regions are currently hard coded
-        region = input('Region? (NA, EUW, KR, etc.) ') + '1'
-        summonerName = input("Summoner Name? ")
-        gain = int(input("What are your LP gains? "))
-        lose = int(input("What are your LP losses? "))
-        winrate = leagueStats.winrate(region, summonerName)
+        # region = input("Region? (NA, EUW, KR, etc.) ") + "1"
+        # summonerName = input("Summoner Name? ")
+        winrate = int(input("What is your winrate (~40-60)? "))
+        lpGained = int(input("What are your LP gains (~10-20)? "))
+        lpLost = int(input("What are your LP losses (~10-20)? "))
+        numSims = int(input("How many simulations would you like to run per test (prod uses: 1000)? "))
         totalForfeit = []
         totalHostage = []
         totalPForfeit = []
@@ -105,9 +105,9 @@ class leagueStats:
             halfSimForfeit = [[],[]]
             halfSimHostage = [[],[]]
 # run a simulation i times and plot each point generated
-            for i in range(1000):
-                tempForfeit = leagueStats.runSimForfeit(winrate, gain, lose)
-                tempHostage = leagueStats.runSimHostage(winrate, count, gain, lose)
+            for i in range(numSims):
+                tempForfeit = leagueStats.runSimForfeit(winrate, lpGained, lpLost)
+                tempHostage = leagueStats.runSimHostage(winrate, count, lpGained, lpLost)
                 for j in range(2):
                     simForfeit[j] += tempForfeit[j]
                     simHostage[j] += tempHostage[j]
@@ -117,7 +117,7 @@ class leagueStats:
                         halfSimHostage[j] += tempHostage[j]
             totalForfeit.append(halfSimForfeit)
             totalHostage.append(halfSimHostage)
-# calculate the max of each line of best fit
+# perform linear regression on the dataset
             zForfeit = np.polyfit(simForfeit[0], simForfeit[1],1)
             zHostage = np.polyfit(simHostage[0], simHostage[1],1)
             pForfeit = np.poly1d(zForfeit)
