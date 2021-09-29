@@ -1,11 +1,12 @@
 from riotwatcher import LolWatcher
 import numpy as np
 import matplotlib.pyplot as plt
+import time
 
-watcher = LolWatcher("RGAPI-644098ad-71e0-436e-8ac8-c1d4ddffbfaf")
+watcher = LolWatcher("INSERT KEY HERE")
 
 class leagueStats:
-# function to query winrate from riotAPI
+# method to query winrate from riotAPI
     def winrate(region, summonerName):
 # regions are currently hard coded
         if region == ('KR1' or 'RU1'):
@@ -17,7 +18,7 @@ class leagueStats:
             return round(100 * (stats[0]["wins"] / (stats[0]["wins"] + stats[0]["losses"])))
         else:
             return round(100 * (stats[1]["wins"] / (stats[1]["wins"] + stats[1]["losses"])))
-# function for a player that forfeits every game predetermined to be a loss at 20 minutes
+# method for a player that forfeits every game predetermined to be a loss at 20 minutes
     def runSimForfeit(winrate, gain, lose):
         x = []
         y = []
@@ -37,7 +38,7 @@ class leagueStats:
             x.append(time)
             y.append(lp)
         return [x, y]
-# function for a player that holds every game hostage for the chance that a predetermined loss is winnable
+# method for a player that holds every game hostage for the chance that a predetermined loss is winnable
     def runSimHostage(winrate, winnablePercent, gain, lose):
         x = []
         y = []
@@ -63,7 +64,7 @@ class leagueStats:
             x.append(time)
             y.append(lp)
         return [x, y]
-# function for graphing subplots
+# method for graphing subplots
     def graph(totalForfeit, totalHostage, totalPForfeit, totalPHostage, simCount):
         cols = 3
         rows = simCount // cols
@@ -83,7 +84,7 @@ class leagueStats:
             ax.legend(["Forfeit Player", "Hostage Player"])
         fig.tight_layout()
         plt.show()
-# main function
+# main method
     def main():
 # prompt user input, regions are currently hard coded
         region = input('Region? (NA, EUW, KR, etc.) ') + '1'
