@@ -28,4 +28,5 @@ You are then ready to run the program. For the best sample results, use the valu
 The output you get should be a window filled with subplots, the number of which being dependent on the provided input variables. Since the goal of the program is to determine if a player should forfeit a game to save time, 2 simulations are plotted as the amount of points gained or lost over 100 hours.
 - The red line (Forfeit Player) corrisponds to a player that forfeits every game that is predetermined to be a loss as soon as possible (20 minutes).
 - The blue line corrisponds to a player that, in essence, gives the game another chance in exchange for 20 extra minutes if the game is lost anyways (40 minutes win or loss after this second chance is given).
+
 Wins take a random integer amount of time between 25 and 35 minutes.
