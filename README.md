@@ -19,11 +19,12 @@ I started this project for two main reasons,
 Normally an API key is used to query a users summoner name and winrate, but publishing a valid API key here is a security risk. Therefore, the demonstration must run in a separate file with basic user inputs in place of variables that would normally be queried. This still gives you the ability to 
 
 To view an analysis, you must:
-- Have python installed.
+- Install Python.
 - Install the packages "numpy" and "matplotlib" with pip.
 If this is something you are unfamiliar with, refer to the following: https://www.python.org/downloads/.
-You are then ready to run the program. For the best sample results, use the values 52, 16, 14, 500 as inputs. Maximize the output window for the best viewing experience.
 - Clone the repository and run the Python program "should_i_forfeit_sample.py", located in the main directory.
+
+For the best sample results, use the values 52, 16, 14, 500 as inputs. Maximize the output window for the best viewing experience.
 
 ## The Output
 The output you get should be a window filled with subplots, the number of which being dependent on the provided input variables. Since the goal of the program is to determine if a player should forfeit a game to save time, 2 simulations are plotted as the amount of points gained or lost over 100 hours.
