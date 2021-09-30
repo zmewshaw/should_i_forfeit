@@ -1,6 +1,6 @@
 # Should_I_Forfeit
 ## About
-Here is a project I started to settle the argument of whether or not it is worth it to forfeit a game in the popular online game: League of Legends. It can accomplish this through running statistical analysis on data queried from the Riot Games API.
+Here is a project I started to settle the argument of whether or not it is worth it to forfeit a game in the popular online game: League of Legends, to save time. It can accomplish this through running statistical analysis on data queried from the Riot Games API.
 
 ## Purpose
 I started this project for two main reasons,
