@@ -2,7 +2,7 @@ from riotwatcher import LolWatcher
 import numpy as np
 import matplotlib.pyplot as plt
 
-watcher = LolWatcher("RGAPI-47b9a89f-0fab-4883-83fb-0a5f7a652e18")
+watcher = LolWatcher("nice try")
 
 class leagueStats:
 # function to query winrate from riotAPI
@@ -32,7 +32,7 @@ class leagueStats:
 # else game is predetermined to be a win
             else:
                 lp += gain
-                time += np.random.randint(20, 56)
+                time += np.random.randint(25, 36)
 # store values to an array
             x.append(time)
             y.append(lp)
@@ -58,7 +58,7 @@ class leagueStats:
 # else game is predetermined to be a win
             else:
                 lp += gain
-                time += np.random.randint(20, 56)
+                time += np.random.randint(25, 36)
 # store values to an array
             x.append(time)
             y.append(lp)
@@ -106,8 +106,6 @@ class leagueStats:
             maxForfeit = pForfeit(6000)
             maxHostage = pHostage(6000)
             count += 1
-
 # debug graphs: print("{count}: maxForfeit = {maxForfeit} | maxHostage = {maxHostage}".format(count = count, maxForfeit = maxForfeit, maxHostage = maxHostage))
-
         return [totalForfeit, totalHostage, totalPForfeit, totalPHostage, count]
 leagueStats.main()

@@ -32,7 +32,7 @@ class leagueStats:
 # else game is predetermined to be a win
             else:
                 lp += lpGained
-                time += np.random.randint(20, 56)
+                time += np.random.randint(25, 36)
 # store values to an array
             x.append(time)
             y.append(lp)
@@ -58,7 +58,7 @@ class leagueStats:
 # else game is predetermined to be a win
             else:
                 lp += lpGained
-                time += np.random.randint(20, 56)
+                time += np.random.randint(25, 36)
 # store values to an array
             x.append(time)
             y.append(lp)
