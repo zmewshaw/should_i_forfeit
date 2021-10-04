@@ -92,6 +92,8 @@ class leagueStats:
         lpGained = int(input("What are your LP gains (~10-20)? "))
         lpLost = int(input("What are your LP losses (~10-20)? "))
         numSims = int(input("How many simulations would you like to run per test (prod uses: 1000)? "))
+        print("Simulation counter: ")
+
         totalForfeit = []
         totalHostage = []
         totalPForfeit = []
@@ -127,6 +129,7 @@ class leagueStats:
             maxForfeit = pForfeit(6000)
             maxHostage = pHostage(6000)
             count += 1
+            print("{numSims} simulations run".format(numSims = numSims * count))
 # debug graphs: print("{count}: maxForfeit = {maxForfeit} | maxHostage = {maxHostage}".format(count = count, maxForfeit = maxForfeit, maxHostage = maxHostage))
         leagueStats.graph(totalForfeit, totalHostage, totalPForfeit, totalPHostage, count)
 leagueStats.main()
