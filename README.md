@@ -32,6 +32,3 @@ The output you get should be a window filled with subplots, the number of which 
 - The blue line corrisponds to a player that, in essence, gives the game another chance in exchange for 20 extra minutes if the game is lost anyways (40 minutes win or loss after this second chance is given).
 
 Wins take a random integer amount of time between 25 and 35 minutes.
-
-### Side Note
-Progress on this project has slowed down since I have enrolled in the Deep Learning Specialization offered by DeepLearning.AI as I am balancing this with taking 18 credits, along with studying CTF's and cybersecurity in general.
